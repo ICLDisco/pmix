@@ -90,6 +90,8 @@ typedef uint32_t pmix_ptl_tag_t;
 #define PMIX_PTL_TAG_NOTIFY           0
 #define PMIX_PTL_TAG_HEARTBEAT        1
 
+#define PMIX_PTL_TAG_RING_HEARTBEAT                2
+#define PMIX_PTL_TAG_RING_HEARTBEAT_REQUEST        3
 /* define the start of dynamic tags that are
  * assigned for send/recv operations */
 #define PMIX_PTL_TAG_DYNAMIC        100

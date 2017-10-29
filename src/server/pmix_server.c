@@ -71,7 +71,10 @@
  * as it can, and often does, behave as a client */
 #include "src/client/pmix_client_ops.h"
 #include "pmix_server_ops.h"
-
+#include "src/mca/pdetector/pdetector.h"
+#include "src/mca/pdetector/base/base.h"
+#include "src/mca/perrmgr/perrmgr.h"
+#include "src/mca/perrmgr/base/base.h"
 // global variables
 pmix_server_globals_t pmix_server_globals = {{{0}}};
 
@@ -290,6 +293,8 @@ PMIX_EXPORT pmix_status_t PMIx_server_init(pmix_server_module_t *module,
         PMIX_RELEASE_THREAD(&pmix_global_lock);
         return PMIX_ERR_INIT;
     }
+    pmix_perrmgr.start();
+    //pmix_pdetector.start();
 
     ++pmix_globals.init_cntr;
     PMIX_RELEASE_THREAD(&pmix_global_lock);

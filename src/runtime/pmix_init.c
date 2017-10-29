@@ -49,6 +49,9 @@
 #include "src/mca/psec/base/base.h"
 #include "src/mca/preg/base/base.h"
 #include "src/mca/ptl/base/base.h"
+#include "src/mca/pdetector/base/base.h"
+#include "src/mca/perrmgr/base/base.h"
+
 
 #include "src/event/pmix_event.h"
 #include "src/include/types.h"
@@ -269,6 +272,27 @@ int pmix_rte_init(pmix_proc_type_t type,
         error = "pmix_preg_base_select";
         goto return_error;
     }
+
+    /*if (PMIX_SUCCESS != (ret = pmix_mca_base_framework_open(&pmix_pdetector_base_framework, 0))) {
+        error = "pmix_pdetector_base_open";
+        return ret;
+    }
+    if (PMIX_SUCCESS != (ret = pmix_pdetector_base_select())) {
+         error = "pmix_pdetector_base_select";
+         goto return_error;
+    }
+    */
+    if (PMIX_SUCCESS != (ret = pmix_mca_base_framework_open(&pmix_perrmgr_base_framework, 0))) {
+        error = "pmix_perrmgr_base_open";
+        return ret;
+    }
+    if (PMIX_SUCCESS != (ret = pmix_perrmgr_base_select())) {
+        error = "pmix_perrmgr_base_select";
+        goto return_error;
+    }
+
+    /* tell libevent that we need thread support */
+    pmix_event_use_threads();
 
     /* if an external event base wasn't provide, create one */
     if (!pmix_globals.external_evbase) {

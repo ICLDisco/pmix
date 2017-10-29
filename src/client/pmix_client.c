@@ -79,6 +79,30 @@ static const char pmix_version_string[] = PMIX_VERSION;
 #include "pmix_client_ops.h"
 
 #define PMIX_MAX_RETRIES 10
+size_t errhandler_refs;
+static void notification_fn1(size_t evhdlr_registration_id,
+        pmix_status_t status,
+        const pmix_proc_t *source,
+        pmix_info_t info[], size_t ninfo,
+        pmix_info_t results[], size_t nresults,
+        pmix_event_notification_cbfunc_fn_t cbfunc,
+        void *cbdata)
+{
+    pmix_output_verbose(0,"Client notification_fn, event happened from source %s:%d with status %d with %d info %s type %d  \n",
+            source->nspace,source->rank,status, ninfo, info[0].key, info[0].value.type, info[0].value.data);
+    if (NULL != cbfunc) {
+        cbfunc(PMIX_EVENT_ACTION_COMPLETE, NULL, 0, NULL, NULL, cbdata);
+    }
+}
+
+static void errhandler_reg_callbk1(pmix_status_t status,
+        size_t errhandler_ref,
+        void *cbdata)
+{
+    pmix_output_verbose(0,"Client: errhandler registed in client  %d, ref=%lu",
+            status, (unsigned long)errhandler_ref);
+
+}
 
 static void _notify_complete(pmix_status_t status, void *cbdata)
 {
@@ -585,6 +609,11 @@ PMIX_EXPORT pmix_status_t PMIx_Init(pmix_proc_t *proc,
         PMIX_DESTRUCT_LOCK(&reglock);
     }
     PMIX_INFO_DESTRUCT(&ginfo);
+
+    pmix_status_t status;
+    status = PMIX_ERR_PROC_ABORTED;
+    PMIx_Register_event_handler(&status, 1, NULL, 0,
+            notification_fn1, NULL, &errhandler_refs);//errhandler_reg_callbk1
 
     /* check to see if we need to notify anyone */
     if (NULL != info) {
